@@ -10,13 +10,19 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.post("/download", async (req, res) => {
-  const { transferId } = req.body;
-
+  var { transferId } = req.body;
+  const url = transferId;
+  const match = url.match(/\/([^\/]+)$/);
+  
+  if (match) {
+      transferId = match[1];
+  }
+  
   if (!transferId) {
     return res.status(400).json({ error: "Transfer ID is required." });
   }
 
-  const filePath = `./downloads/${transferId}.pdf`;
+  const filePath = `./downloads/RapidDrop.pdf`;
 
   try {
     // Ensure downloads directory exists
@@ -33,7 +39,7 @@ app.post("/download", async (req, res) => {
 
     await downloader.download();
 
-    res.download(filePath, `RapidDrop_${transferId}.pdf`, (err) => {
+    res.download(filePath, `RapidDrop.pdf`, (err) => {
       if (err) {
         console.error("Error sending file:", err);
         return res.status(500).json({ error: "Failed to send the file." });
